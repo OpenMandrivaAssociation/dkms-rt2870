@@ -1,19 +1,19 @@
 %define module rt2870
-%define version 1.3.1.0
+%define version 1.4.0.0
 %define card Ralink RT2870 WiFi cards
 
-%define distname 2008_0718_RT2870_Linux_STA_v%{version}
+%define distname 2008_0925_RT2870_Linux_STA_v%{version}
 
 Summary: dkms package for %{module} driver
 Name: dkms-%{module}
 Version: %{version}
-Release: %mkrel 2
+Release: %mkrel 1
 Source0: http://www.ralinktech.com.tw/data/drivers/%{distname}.tar.bz2
-Source1: dkms-rt2870-wext_compat.patch
-Source2: dkms-rt2870-pid.patch
 Patch0: dkms-rt2870-Makefile.patch
 Patch1: dkms-rt2870-firmware.patch
+Patch2:	dkms-rt2870-uid.patch
 Patch3: dkms-rt2870-strip_firmware.patch
+Patch4:	dkms-rt2870-netdev_priv.patch
 License: GPLv2+
 Group: System/Kernel and hardware
 URL: http://www.ralinktech.com/
@@ -31,7 +31,9 @@ This package contains the %{module} driver for
 %setup -q -n %{distname}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 %patch3 -p1
+%patch4 -p1 -b .netdev_priv
 
 rm -rf tools
 
@@ -49,18 +51,9 @@ BUILT_MODULE_LOCATION[0]=os/linux
 MAKE[0]="make LINUX_SRC=\$kernel_source_dir HAS_WPA_SUPPLICANT=y HAS_NATIVE_WPA_SUPPLICANT_SUPPORT=y"
 AUTOINSTALL="yes"
 
-PATCH[0]="dkms-rt2870-wext_compat.patch"
-PATCH_MATCH[0]="^2\.6\.(2[7-9])|([3-9][0-9]+)|([1-9][0-9][0-9]+)"
-PATCH[1]="dkms-rt2870-pid.patch"
-PATCH_MATCH[1]="^2\.6\.(2[7-9])|([3-9][0-9]+)|([1-9][0-9][0-9]+)"
 EOF
 
 tar c . | tar x -C %{buildroot}/usr/src/%{module}-%{version}-%{release}/
-
-cp %{_sourcedir}/dkms-rt2870-wext_compat.patch \
-   %{buildroot}/usr/src/%{module}-%{version}-%{release}/patches
-cp %{_sourcedir}/dkms-rt2870-pid.patch \
-   %{buildroot}/usr/src/%{module}-%{version}-%{release}/patches
 
 mkdir -p %{buildroot}%{_sysconfdir}/Wireless/RT2870STA
 install -m 644 RT2870STA.dat %{buildroot}%{_sysconfdir}/Wireless/RT2870STA
