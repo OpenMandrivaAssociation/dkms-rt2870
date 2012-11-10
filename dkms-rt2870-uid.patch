@@ -1,0 +1,32 @@
+--- 2008_0925_RT2870_Linux_STA_v1.4.0.0/os/linux/rt_profile.c.ori	2008-09-19 07:40:52.000000000 +0200
++++ 2008_0925_RT2870_Linux_STA_v1.4.0.0/os/linux/rt_profile.c	2009-03-03 18:39:21.000000000 +0100
+@@ -890,7 +890,7 @@
+ {
+ 	PUCHAR					src = NULL;
+ 	struct file				*srcf;
+-	INT 					retval, orgfsuid, orgfsgid;
++	INT 					retval;
+    	mm_segment_t			orgfs;
+ 	CHAR					*buffer;
+ 	CHAR					*tmpbuf;
+@@ -923,11 +923,6 @@
+ 	src = pAd->MC_FileName;
+ #endif // MULTIPLE_CARD_SUPPORT //
+ 
+-	// Save uid and gid used for filesystem access.
+-	// Set user and group to 0 (root)	
+-	orgfsuid = current->fsuid;
+-	orgfsgid = current->fsgid;
+-	current->fsuid=current->fsgid = 0;
+     orgfs = get_fs();
+     set_fs(KERNEL_DS);
+ 
+@@ -1590,8 +1585,6 @@
+ 	}
+ 
+ 	set_fs(orgfs);
+-	current->fsuid = orgfsuid;
+-	current->fsgid = orgfsgid;
+ 
+ 	kfree(buffer);
+ 	kfree(tmpbuf);

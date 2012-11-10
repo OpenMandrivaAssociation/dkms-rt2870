@@ -1,0 +1,75 @@
+--- 2008_0925_RT2870_Linux_STA_v1.4.0.0/Makefile.orig	2009-03-03 18:03:07.000000000 +0100
++++ 2008_0925_RT2870_Linux_STA_v1.4.0.0/Makefile	2009-03-03 18:04:10.000000000 +0100
+@@ -114,13 +114,9 @@ endif
+ 
+ export RT28xx_DIR RT28xx_MODE LINUX_SRC CROSS_COMPILE CROSS_COMPILE_INCLUDE PLATFORM RELEASE CHIPSET RTMP_SRC_DIR LINUX_SRC_MODULE
+ 
+-all: build_tools $(TARGET)
++all: $(TARGET)
+ 
+ 
+-build_tools:
+-	make -C tools
+-	$(RT28xx_DIR)/tools/bin2h
+-
+ UCOS:
+ 	make -C os/ucos/ MODE=$(RT28xx_MODE)
+ 	echo $(RT28xx_MODE)
+--- 2008_0925_RT2870_Linux_STA_v1.4.0.0/common/rtmp_init.c.orig	2008-09-19 05:46:18.000000000 +0200
++++ 2008_0925_RT2870_Linux_STA_v1.4.0.0/common/rtmp_init.c	2009-03-03 18:07:06.000000000 +0100
+@@ -38,9 +38,8 @@
+     Jan Lee  2006-09-15    RT2860. Change for 802.11n , EEPROM, Led, BA, HT.
+ */
+ #include	"rt_config.h"
+-#include 	"firmware.h"
+ 
+-//#define BIN_IN_FILE /* use *.bin firmware */
++#define BIN_IN_FILE /* use *.bin firmware */
+ 
+ UCHAR    BIT8[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+ ULONG    BIT32[] = {0x00000001, 0x00000002, 0x00000004, 0x00000008,
+@@ -2765,13 +2764,8 @@ NDIS_STATUS NICLoadFirmware(
+ 
+ 	/* init */
+ 	pFirmwareImage = NULL;
+-	src = RTMP_FIRMWARE_FILE_NAME;
++	src = STA_RT2870_IMAGE_FILE_NAME;
+ 
+-	/* save uid and gid used for filesystem access.
+-	   set user and group to 0 (root) */
+-	orgfsuid = current->fsuid;
+-	orgfsgid = current->fsgid;
+-	current->fsuid = current->fsgid = 0;
+     orgfs = get_fs();
+     set_fs(KERNEL_DS);
+ 
+@@ -2900,9 +2900,9 @@
+ 			kfree(pFirmwareImage);
+ 		/* End of if */
+ 
+-		/* use default *.bin array */
+-		pFirmwareImage = FirmwareImage;
+-		FileLength = sizeof(FirmwareImage);
++		Status = NDIS_STATUS_FAILURE;
++		DBGPRINT(RT_DEBUG_ERROR, ("NICLoadFirmware: failed to load firmware\n"));
++		goto NICLoadFirmware_out;
+ 	} /* End of if */
+ 
+ 	/* enable Host program ram write selection */
+@@ -2939,8 +2934,6 @@
+ 	} /* End of if */
+ 
+ 	set_fs(orgfs);
+-	current->fsuid = orgfsuid;
+-	current->fsgid = orgfsgid;
+ #else
+ 
+ 	NDIS_STATUS		Status = NDIS_STATUS_SUCCESS;
+@@ -3018,6 +3018,7 @@
+     DBGPRINT(RT_DEBUG_TRACE,
+ 			 ("<=== %s (src=%s, status=%d)\n", __FUNCTION__, src, Status));
+ #else
++NICLoadFirmware_out:
+     DBGPRINT(RT_DEBUG_TRACE,
+ 			 ("<=== %s (status=%d)\n", __FUNCTION__, Status));
+ #endif
