@@ -16,7 +16,7 @@ Patch3: dkms-rt2870-strip_firmware.patch
 Patch4:	dkms-rt2870-netdev_priv.patch
 License: GPLv2+
 Group: System/Kernel and hardware
-URL: http://www.ralinktech.com/
+URL: https://www.ralinktech.com/
 Requires(preun): dkms
 Requires(post): dkms
 Suggests: rt2870-firmware
