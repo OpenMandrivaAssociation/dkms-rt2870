@@ -7,7 +7,7 @@
 Summary: dkms package for %{module} driver
 Name: dkms-%{module}
 Version: %{version}
-Release: %mkrel 1
+Release: 2
 Source0: http://www.ralinktech.com.tw/data/drivers/%{distname}.tar.bz2
 Patch0: dkms-rt2870-Makefile.patch
 Patch1: dkms-rt2870-firmware.patch
